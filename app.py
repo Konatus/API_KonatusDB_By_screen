@@ -70,5 +70,22 @@ JOIN
         return jsonify({"data": data})
     finally:
         server.stop()
+
+@app.route('/screen1', methods=['GET'])
+def test_query():
+    engine, server = create_engine_with_ssh()
+
+    try:
+        # Test SELECT query
+        select_query = """
+SELECT * FROM program_backlog;
+"""
+        result_proxy = execute_select_query(engine, select_query)
+        column_names = result_proxy.keys()
+        data = [dict(zip(column_names, row)) for row in result_proxy.fetchall()]
+        return jsonify({"data": data})
+    finally:
+        server.stop()
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
