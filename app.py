@@ -77,7 +77,7 @@ def screen1_query():
         result_proxy = execute_select_query(engine, select_query)
         column_names = result_proxy.keys()
         data = [dict(zip(column_names, row)) for row in result_proxy.fetchall()]
-        return jsonify({"data": data})
+        return jsonify(data)
     finally:
         server.stop()
 
