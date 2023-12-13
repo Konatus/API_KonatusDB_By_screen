@@ -28,6 +28,9 @@ def execute_select_query(engine, query):
     with engine.connect() as connection:
         result_proxy = connection.execute(text(query))
         return result_proxy
+@app.route('/', methods=['GET'])
+def home():
+    return render_template('index.html', message="API en cours de développement")
 @app.route('/test', methods=['GET'])
 def test_query():
     engine, server = create_engine_with_ssh()
