@@ -31,55 +31,49 @@ def execute_select_query(engine, query):
 @app.route('/', methods=['GET'])
 def home():
     return render_template('index.html', message="API en cours de développement")
+
 @app.route('/test', methods=['GET'])
 def test_query():
     engine, server = create_engine_with_ssh()
 
     try:
-        # Test SELECT query
+        # Test SELECT query for /test route
         select_query = """
-SELECT
-    public.organization.id,
-    public.organization.title,
-    public.unit.id,
-    public.unit.name,
-    public.program_backlog.id,
-    public.program_backlog.programname,
-    public.team.id,
-    public.team.libelle,
-    public.team.name
-FROM
-    public.organization
-JOIN
-    public.unit ON public.organization.id = public.unit.organization_id
-JOIN
-    public.program_backlog ON public.unit.id = CAST(public.program_backlog.id AS INTEGER)
-JOIN
-    public.team ON public.unit.id = public.team."idUnit";
-"""
-
+            SELECT
+                public.organization.id,
+                public.organization.title,
+                public.unit.id,
+                public.unit.name,
+                public.program_backlog.id,
+                public.program_backlog.programname,
+                public.team.id,
+                public.team.libelle,
+                public.team.name
+            FROM
+                public.organization
+            JOIN
+                public.unit ON public.organization.id = public.unit.organization_id
+            JOIN
+                public.program_backlog ON public.unit.id = CAST(public.program_backlog.id AS INTEGER)
+            JOIN
+                public.team ON public.unit.id = public.team."idUnit";
+        """
         result_proxy = execute_select_query(engine, select_query)
-
-        # Obtenez les noms de colonnes directement à partir de l'objet ResultProxy
         column_names = result_proxy.keys()
-
-        # Récupérez les résultats sous forme de dictionnaires
         data = [dict(zip(column_names, row)) for row in result_proxy.fetchall()]
-
-        # Utilisez jsonify pour créer une réponse JSON
         return jsonify({"data": data})
     finally:
         server.stop()
 
 @app.route('/screen1', methods=['GET'])
-def test_query():
+def screen1_query():
     engine, server = create_engine_with_ssh()
 
     try:
-        # Test SELECT query
+        # Test SELECT query for /screen1 route
         select_query = """
-SELECT * FROM program_backlog;
-"""
+            SELECT * FROM program_backlog;
+        """
         result_proxy = execute_select_query(engine, select_query)
         column_names = result_proxy.keys()
         data = [dict(zip(column_names, row)) for row in result_proxy.fetchall()]
