@@ -119,5 +119,42 @@ def organisation_team():
 
     finally:
         server.stop()
+@app.route('/organisation_unit', methods=['GET'])
+def organisation_unit():
+    engine, server = create_engine_with_ssh()
+
+    try:
+        # SQL Query
+        select_query = """
+            SELECT
+                org.org_id,
+                org.org_name,
+                unit.id AS unit_id,
+                unit.name AS unit_name,
+                pb.prbg_id AS program_backlog_id,
+                pb.prbg_name,
+                t.id AS team_id,
+                t.libelle AS team_libelle,
+                t.name AS team_name
+            FROM
+                public.organisation org
+            JOIN
+                public.unit unit ON org.org_id = unit.id
+            JOIN
+                public.program_backlog pb ON unit.id = pb.prbg_id::integer
+            JOIN
+                public.team t ON unit.id = t."idUnit";
+        """
+        result_proxy = execute_select_query(engine, select_query)
+        column_names = result_proxy.keys()
+        data = [dict(zip(column_names, row)) for row in result_proxy.fetchall()]
+
+        return jsonify(data)
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+    finally:
+        server.stop()
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
