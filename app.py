@@ -80,6 +80,44 @@ def screen1_query():
         return jsonify(data)
     finally:
         server.stop()
+@app.route('/organisation_team', methods=['GET'])
+def organisation_team():
+    engine, server = create_engine_with_ssh()
 
+    try:
+        # SQL Query
+        select_query = """
+            SELECT
+                org.org_id,
+                org.org_name,
+                unit.id AS unit_id,
+                unit.name AS unit_name,
+                team.id AS team_id,
+                team.libelle AS team_libelle,
+                team.name AS team_name,
+                ressource.id AS ressource_id,
+                ressource.name AS ressource_name
+            FROM
+                public.organisation org
+            JOIN
+                public.unit unit ON org.org_id::text = unit.organization_id
+            JOIN
+                public.team team ON unit.id = team."idUnit"
+            JOIN
+                public.team_ressources tr ON team.id = tr.idteam
+            JOIN
+                public.ressources ressource ON tr.idressource = ressource.id;
+        """
+        result_proxy = execute_select_query(engine, select_query)
+        column_names = result_proxy.keys()
+        data = [dict(zip(column_names, row)) for row in result_proxy.fetchall()]
+
+        return jsonify(data)
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+    finally:
+        server.stop()
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
