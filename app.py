@@ -40,8 +40,8 @@ def test_query():
         # Test SELECT query for /test route
         select_query = """
             SELECT
-                public.organization.id,
-                public.organization.title,
+                public.organisation.id,
+                public.organisation.title,
                 public.unit.id,
                 public.unit.name,
                 public.program_backlog.id,
@@ -52,7 +52,7 @@ def test_query():
             FROM
                 public.organization
             JOIN
-                public.unit ON public.organization.id = public.unit.organization_id
+                public.unit ON public.organisation.id = public.unit.organisation_id
             JOIN
                 public.program_backlog ON public.unit.id = CAST(public.program_backlog.id AS INTEGER)
             JOIN
